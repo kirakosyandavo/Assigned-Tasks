@@ -22,16 +22,6 @@ public:
         balance += amount;
         logs.push_back(new Transaction("deposit", amount, balance));
     }
-
-    virtual bool withdraw(double amount) {
-        if (amount > balance) {
-            return false;
-        }
-        balance -= amount;
-        logs.push_back(new Transaction("withdrawal", amount, balance));
-        return true;
-    }
-
     virtual double balanceAmount() const {
         return balance;
     }
@@ -90,20 +80,24 @@ public:
         }
         logs.clear();
     }
+    virtual void monthEnd()=0;
+    virtual void withdraw(double amount)=0; 
+
 };
 
-class SasvingsAccount : public BankAccount {
+class SavingsAccount : public BankAccount {
     double interest;
 
 public:
-    SasvingsAccount(double inter, string name, double sum)
+    SavingsAccount(const string& name,double inter, double sum)
         : interest{inter}, BankAccount(name, sum) {}
 
-    void addinterest() {
+    void monthEnd() {
         double interAmount = interest * balance;
         balance += interAmount;
         logs.push_back(new Transaction("interest", interAmount, balance));
     }
+    void withdraw(double amount){}
 };
 
 class CheckingAccount : public BankAccount {
@@ -113,12 +107,25 @@ public:
     CheckingAccount(const string& name, double sum, double od)
         : BankAccount(name, sum), overdraft{od} {}
 
-    bool withdraw(double amount) override {
+ void withdraw(double amount) override {
         if (amount > balance + overdraft) {
-            return false;
+            throw invalid_argument("you have not such money");
         }
         balance -= amount;
         logs.push_back(new Transaction("withdrawal", amount, balance));
-        return true;
     }
+    void monthEnd(){}
 };
+int main() {
+    SavingsAccount sa("Alice", 1000, 0.02);
+    sa.deposit(200);
+    sa.withdraw(50);
+    sa.monthEnd();
+   
+
+    cout << "---\n";
+
+    CheckingAccount ca("Bob", 500, 200);
+    ca.withdraw(600);
+    ca.deposit(100);
+}

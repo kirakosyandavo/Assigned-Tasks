@@ -2,64 +2,69 @@
 #include <memory>
 using namespace std;
 
-class Behaviour {
+class IMovable {
 public:
-    virtual void execute() = 0;
-    virtual ~Behaviour() = default;
+    virtual void travelTime(double km) = 0;
+    virtual ~IMovable()=default;
 };
 
-class FlightMechanics : public Behaviour {
+class IRoadVehicle:public IMovable{
 public:
-    void execute() override {
-        cout << "your transport fly" << endl;
-    }
-};
-
-class Driving : public Behaviour {
-public:
-    void execute() override {
+    void travelTime(double km) override {
         cout << "your transport drive" << endl;
     }
 };
 
+class IAircraft: public IMovable {
+public:
+    void travelTime(double km) override {
+        cout << "your transport fly" << endl;
+    }
+};
+class IRailVehicle: public IMovable {
+public:
+    void travelTime(double km) override {
+        cout << "your transport rail" << endl;
+    }
+};
 class Transport {
 public:
-    virtual void move() = 0;
+    virtual void move(double km) = 0;
     virtual ~Transport() = default;
 };
 
 class Car : public Transport {
-    unique_ptr<Behaviour> ptr;
+    unique_ptr<IMovable> ptr;
 public:
     Car() {
-        ptr = make_unique<Driving>();
+        ptr = make_unique<IRoadVehicle>();
     }
 
-    void move() override {
-        ptr->execute();
+    void move(double km) override {
+        ptr->travelTime(km);
     }
 };
 
-class Bike : public Transport {
-    unique_ptr<Behaviour> ptr;
+class TRain : public Transport {
+    unique_ptr<IMovable> ptr;
 public:
-    Bike() {
-        ptr = make_unique<Driving>();
+    TRain() {
+        ptr = make_unique<IRailVehicle>();
     }
 
-    void move() override {
-        ptr->execute();
+    void move(double km) override {
+        ptr->travelTime(km);
     }
 };
 
 class Plane : public Transport {
-    unique_ptr<Behaviour> ptr;
+    unique_ptr<IMovable> ptr;
 public:
     Plane() {
-        ptr = make_unique<FlightMechanics>();
+        ptr = make_unique<IAircraft>();
     }
 
-    void move() override {
-        ptr->execute();
+    void move(double km) override {
+        ptr->travelTime(km);
     }
 };

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
+//I take item instead of Sprite
 class Item {
     string name;
     int power;

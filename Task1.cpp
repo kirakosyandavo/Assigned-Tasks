@@ -7,6 +7,7 @@ class FileSystemNode {
 public:
     virtual int getSize() const = 0;
     virtual void display() const = 0;
+    virtual string _name()const=0;
     virtual ~FileSystemNode() = default;
 };
 
@@ -17,19 +18,23 @@ public:
     int getSize() const override {
         return size;
     }
+    
+    string _name()const override{
+       return name;
+    } 
 
     void display() const override {
         cout << "File size: " << size << endl;
         cout << "File name: " << name << endl;
     }
-
 private:
     int size;
     string name;
 };
 
-class Directory : public FileSystemNode {
+class Directory : public FileSystemNode,public std::enable_shared_from_this<Directory> {
     vector<shared_ptr<FileSystemNode>> direct;
+    weak_ptr<Directory>parent;
     string name;
 
 public:
@@ -43,6 +48,10 @@ public:
         return total;
     }
 
+    string _name()const override{
+       return name;
+    } 
+
     void display() const override {
         for (auto& iter : direct) {
             if (dynamic_pointer_cast<Directory>(iter)) {
@@ -53,9 +62,26 @@ public:
             }
         }
     }
-
-    void insert(const shared_ptr<FileSystemNode>& node) {
+    void add(shared_ptr<FileSystemNode>node){
+        if(auto iter=dynamic_pointer_cast<Directory>(node)){
+            iter->parent=shared_from_this();
+        }
         direct.push_back(node);
-    }
-};
+    } 
+    void delet(string& name){
+              for(auto iter=direct.begin();iter!=direct.end();iter++){
+                   if((*iter)->_name()==name){
+                    direct.erase(iter);
+                    break;
+                   }
+                }
+              }
+
+
+              
+    };
+    
+
+
+
 

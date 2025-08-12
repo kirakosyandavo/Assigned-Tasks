@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
+#include<memory>
 using namespace std;
 
 class Expression {
 public:
     virtual double evaluate() = 0;
     virtual void print() = 0;
+    virtual unique_ptr<Expression> clone() const = 0;
     virtual ~Expression() = default; 
 };
 
@@ -21,55 +23,56 @@ public:
     void print() override {
         cout << number;
     }
+     unique_ptr<Expression> clone() const override {
+        return make_unique<Number>(*this);
+    }
 };
 
 class Multiplication : public Expression {
-    vector<Expression*> vecs;
+    unique_ptr<Expression> left;
+    unique_ptr<Expression> right;
 public:
-    Multiplication(Expression* first, Expression* second) {
-        vecs.push_back(first);
-        vecs.push_back(second);
-    }
-
+    Multiplication(unique_ptr<Expression>lef,unique_ptr<Expression>rig):left(move(lef)),right{move(rig)} {}
     double evaluate() override {
-        return vecs[0]->evaluate() * vecs[1]->evaluate();
+        return left->evaluate() * right->evaluate();
     }
 
     void print() override {
         cout << evaluate() << endl;
+    }
+    unique_ptr<Expression> clone() const override {
+        return make_unique<Multiplication>(*this);
     }
 };
-
-class Addition : public Expression {
-    vector<Expression*> vecs;
+class Addition: public Expression {
+    unique_ptr<Expression> left;
+    unique_ptr<Expression> right;
 public:
-    Addition(Expression* first, Expression* second) {
-        vecs.push_back(first);
-        vecs.push_back(second);
-    }
-
+    Addition(unique_ptr<Expression>lef,unique_ptr<Expression>rig):left(move(lef)),right{move(rig)} {}
     double evaluate() override {
-        return vecs[0]->evaluate() + vecs[1]->evaluate();
+        return left->evaluate() + right->evaluate();
     }
 
     void print() override {
         cout << evaluate() << endl;
+    }
+    unique_ptr<Expression> clone() const override {
+        return make_unique<Addition>(*this);
     }
 };
-
-class Subtraction : public Expression { 
-    vector<Expression*> vecs;
+class Substriction: public Expression {
+    unique_ptr<Expression> left;
+    unique_ptr<Expression> right;
 public:
-    Subtraction(Expression* first, Expression* second) {
-        vecs.push_back(first);
-        vecs.push_back(second);
-    }
-
+    Substriction(unique_ptr<Expression>lef,unique_ptr<Expression>rig):left(move(lef)),right{move(rig)} {}
     double evaluate() override {
-        return vecs[0]->evaluate() - vecs[1]->evaluate();
+        return left->evaluate() -right->evaluate();
     }
 
     void print() override {
         cout << evaluate() << endl;
+    }
+    unique_ptr<Expression> clone() const override {
+        return make_unique<Substriction>(*this);
     }
 };

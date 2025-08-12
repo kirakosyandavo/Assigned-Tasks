@@ -4,15 +4,26 @@
 using namespace std;
 
 class UIComponent {
+  int x=0;
+  int y=0;
+  int w=0;
+  int h=0;  
 public:
-    virtual void draw() = 0;
+  UIComponent(int xs,int ys,int ws,int hs):x{xs},y{ys},w{ws},h{hs}{}
+    virtual void draw()const = 0;
     virtual void onClick() = 0;
     virtual unique_ptr<UIComponent> clone() = 0;
+     bool contains(int xs, int ys) const {
+        return xs >= x && xs < x + w && ys >= y && ys < y + h;
+    }
+    void setPosition(int nx, int ny) { x = nx; y = ny; }
+    int getHeight() const { return h; }
+
 };
 
 class Button : public UIComponent {
 public:
-    void draw() override {
+    void draw()const override {
         cout << "you called draw on Button" << endl;
     }
     void onClick() override {
@@ -25,7 +36,7 @@ public:
 
 class Checkbox : public UIComponent {
 public:
-    void draw() override {
+    void draw()const override {
         cout << "you called draw on Checkbox" << endl;
     }
     void onClick() override {
@@ -38,7 +49,7 @@ public:
 
 class TextField : public UIComponent {
 public:
-    void draw() override {
+    void draw()const override {
         cout << "you called draw on TextField" << endl;
     }
     void onClick() override {
